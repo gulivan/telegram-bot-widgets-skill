@@ -1,0 +1,78 @@
+<!--
+A quiz widget: a few questions, three options each. Answers are recorded by the bot.
+chat_data: {"q":[{"h":"prompt","p":"hint","o":["a","b","c"],"a":1},…],"r":[1,0]}
+  q: the questions (h prompt, p hint, o options, a the right option's index)
+  r: the answers the bot has recorded, 1 right / 0 wrong (written by the bot)
+Each tap sends every answer the bot hasn't confirmed: "q" + index + option, repeated.
+Replace C with your own copy; send it with allow_queries.
+-->
+<style>
+body{margin:0;padding:10px 12px max(10px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--tg-theme-hint-color);font-size:.85em}
+.dots{display:flex;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--tg-theme-section-separator-color)}
+.dot.ok{background:#3f9a5b}.dot.no{background:#d0564a}.dot.cur{background:var(--tg-theme-button-color)}
+.word{text-align:center;margin:10px 0 2px;font-size:2.2em;line-height:1.15}
+.pin{text-align:center;color:var(--tg-theme-hint-color);margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{width:100%;padding:10px 12px;border:0;border-radius:12px;font:inherit;text-align:left;
+ background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-text-color)}
+.opt.ok{background:#3f9a5b;color:#fff}.opt.no{background:#d0564a;color:#fff}
+.done{text-align:center;padding:12px 0 4px}
+.score{font-size:2.2em;font-weight:700}
+.line{color:var(--tg-theme-hint-color);margin-top:2px}
+.list{margin-top:10px;display:flex;justify-content:center;gap:14px;font-size:1.2em}
+.list .no{color:#d0564a}
+</style>
+<div id="app"></div>
+<script>
+var C={all:"All correct!",some:"Nice work, see you soon.",none:"No worries, they'll be back."};
+var W=window.TelegramWidget||{chatData:null},app=document.getElementById('app'),Q=[],srv=[],st={r:[],p:[],ack:0,show:-1},busy=false;
+function readData(){try{var d=JSON.parse(W.chatData)||{};Q=d.q||[];srv=d.r||[]}catch(e){}}
+readData();
+try{var s=JSON.parse(localStorage.getItem('st'));if(s&&s.r)st=s}catch(e){}
+function save(){try{localStorage.setItem('st',JSON.stringify(st))}catch(e){}}
+// The bot's record wins: answers given on another device, and what it confirmed.
+function adopt(){if(srv.length>st.r.length){st.r=srv.slice();st.show=-1}if(srv.length>st.ack)st.ack=srv.length;save()}
+adopt();
+function el(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n}
+function dots(i){var d=el('div','dots');Q.forEach(function(_,k){d.appendChild(el('div','dot'+(k<st.r.length&&k!=st.show?(st.r[k]?' ok':' no'):k==i?' cur':'')))});return d}
+function draw(){
+ app.textContent='';
+ if(!Q.length)return;
+ var i=st.show>=0?st.show:st.r.length;
+ if(i>=Q.length){
+  var n=st.r.filter(Boolean).length,b=el('div','done');
+  b.appendChild(el('div','score',n+' / '+Q.length));
+  b.appendChild(el('div','line',n==Q.length?C.all:n?C.some:C.none));
+  var l=el('div','list');Q.forEach(function(q,k){l.appendChild(el('span',st.r[k]?'':'no',q.h))});b.appendChild(l);
+  app.appendChild(b);W.ready&&W.ready();return
+ }
+ var q=Q[i],top=el('div','top');
+ top.appendChild(el('span','',(i+1)+' / '+Q.length));top.appendChild(dots(i));app.appendChild(top);
+ app.appendChild(el('div','word',q.h));if(q.p)app.appendChild(el('div','pin',q.p));
+ var o=el('div','opts');
+ q.o.forEach(function(t,k){
+  var b=el('button','opt',t);
+  if(st.show==i){if(k==q.a)b.className='opt ok';else if(k==st.p[i])b.className='opt no'}
+  b.onclick=function(){answer(k)};o.appendChild(b)
+ });
+ app.appendChild(o);W.ready&&W.ready()
+}
+// Called inside the tap handler: request() is allowed only there, synchronously.
+function send(){
+ var d='q';for(var k=st.ack;k<st.r.length;k++)d+=k+''+(st.p[k]==null?9:st.p[k]);
+ if(d.length<2||!W.request)return;
+ try{W.request(d).then(function(a){try{var r=JSON.parse(a.result).r;if(r&&r.length>st.ack){st.ack=r.length;save()}}catch(e){}},function(){})}catch(e){}
+}
+function answer(k){
+ var i=st.r.length;
+ if(busy||st.show>=0||i>=Q.length)return;busy=true;
+ var ok=k==Q[i].a;st.p[i]=k;st.r.push(ok?1:0);st.show=i;save();send();draw();
+ try{W.HapticFeedback.notificationOccurred(ok?'success':'error')}catch(e){}
+ setTimeout(function(){st.show=-1;save();busy=false;draw()},ok?700:1500)
+}
+if(st.show>=0){st.show=-1;save()}
+draw();
+W.onEvent&&W.onEvent('chatDataChanged',function(){readData();adopt();if(!busy)draw()});
+</script>
