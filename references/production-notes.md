@@ -46,3 +46,7 @@ A widget's HTML is usually a template file next to the bot code. Build and deplo
 ## Preview without a phone
 
 Render the widget in an iframe with a stand-in `TelegramWidget` (see `examples/preview.mjs`) at 270 and 330 px, light and dark. Telegram draws a bit differently, so check one real message on a phone before calling it done.
+
+## The browser preview lies about clipping
+
+A rolling-digit counter built from `display:inline-block; height:1em; overflow:hidden` wheels looked right in every desktop browser. In the Telegram app the box's height was ignored: each 0–9 column drew in full and pushed the rest of the widget out of the bubble. Count numbers up as plain text instead, use block, flex or grid boxes with explicit sizes, and check every clipping trick on a phone before shipping it.

@@ -1,0 +1,112 @@
+<!-- Checkout: a cart edited on the device, paid with a Telegram Stars invoice. State and requests: see logic.mjs. -->
+<style>
+body{margin:0;padding:12px 12px max(10px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif;font-variant-numeric:tabular-nums}
+button{border:0;font:inherit;color:inherit;background:none;padding:0}
+.h,.r,.l,.cp{display:flex;align-items:center;gap:10px}
+.h{font-weight:700;font-size:1.13em;margin-bottom:10px}
+.g{flex:1;min-width:0}
+.d,.l{color:var(--tg-theme-hint-color);font-size:.87em}
+.h .d{font-weight:400}
+.r{margin:9px 0}.z{display:none}
+.th{flex:none;width:42px;height:42px;border-radius:13px;font-size:22px;line-height:42px;text-align:center;background:linear-gradient(135deg,light-dark(hsl(var(--h),90%,91%),hsl(var(--h),45%,32%)),light-dark(hsl(var(--h),85%,78%),hsl(var(--h),50%,20%)))}
+.p0{animation:p0 .3s}.p1{animation:p1 .3s}
+@keyframes p0{50%{transform:scale(1.18)}}@keyframes p1{50%{transform:scale(1.18)}}
+.n{font-weight:600;line-height:1.2;overflow-wrap:anywhere}
+.sp{display:flex;align-items:center;border-radius:16px;background:var(--tg-theme-secondary-bg-color)}
+.sp button{width:28px;height:32px;font-size:19px;line-height:30px;color:var(--tg-theme-link-color)}
+.sp b{min-width:12px;text-align:center}
+.cp{width:100%;margin:12px 0;padding:9px 12px;text-align:left;border:1.5px dashed var(--tg-theme-hint-color);border-radius:13px}
+.cp.on{border:1.5px solid #2fa866;background:rgba(47,168,102,.13)}
+.cp i{font:700 .9em ui-monospace,monospace;letter-spacing:.06em}
+.cp u{text-decoration:none;font-weight:600;color:var(--tg-theme-link-color)}
+.on u,.ok{color:#2fa866}
+.bx{padding:9px 12px 12px;border-radius:16px;background:var(--tg-theme-secondary-bg-color)}
+.l{justify-content:space-between;margin:3px 0}
+.T{align-items:flex-end;margin:6px 0 10px;padding-top:8px;border-top:1px dashed var(--tg-theme-hint-color);color:var(--tg-theme-text-color);font-size:1em;font-weight:600}
+.T>span{font:800 1.9em/1 ui-rounded,system-ui}
+.st{width:.8em;height:.8em;margin-right:3px}
+#t{font-variant-numeric:tabular-nums}
+.b{position:relative;overflow:hidden;width:100%;height:48px;border-radius:14px;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color);font-weight:600;font-size:1.06em}
+.b:after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:sh 3.4s infinite}
+@keyframes sh{0%,55%{transform:none}to{transform:translateX(520%)}}
+.b.off,.b.w{background:var(--tg-theme-bg-color);color:var(--tg-theme-hint-color)}
+.off:after{display:none}
+.b.w:after{left:0;width:200%;background:repeating-linear-gradient(110deg,transparent 0 14px,rgba(128,128,128,.08) 14px 28px);animation:w 1s linear infinite}
+@keyframes w{to{transform:translateX(-31px)}}
+.m{min-height:1.3em;margin-top:7px;text-align:center}
+.er{color:var(--tg-theme-destructive-text-color)}
+.m button{color:var(--tg-theme-link-color)}
+.P{text-align:center;margin-bottom:8px;font-weight:700;font-size:1.3em}
+.P svg{display:block;width:64px;height:64px;margin:2px auto 8px;animation:in .5s cubic-bezier(.2,1.5,.4,1)}
+.P path{stroke-dasharray:30;animation:ck .45s .35s backwards}
+.P .d{display:block;font-weight:400;font-size:.66em}
+@keyframes in{from{transform:scale(0)}}
+@keyframes ck{from{stroke-dashoffset:30}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<svg width="0" height="0" style="position:absolute"><linearGradient id="g" x2="0" y2="1"><stop stop-color="#ffd84d"/><stop offset="1" stop-color="#ff9f1a"/></linearGradient>
+<symbol id="s" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.8z" fill="url(#g)" stroke="url(#g)" stroke-width="2.4" stroke-linejoin="round"/></symbol></svg>
+<div id="a"></div>
+<script>
+const C={title:'Your order',each:' each',apply:'Apply',pay:'Pay',empty:'Add something to pay',busy:'Preparing the invoice…',wait:'Waiting for payment…',
+ sent:'Invoice sent below ↓ ',change:'Change the order',paid:'Paid',copy:'Copy the receipt ID',again:'Try again',view:'Open the bot to order',
+ none:'This order is open in the chat with the shop.',total:'Total',sub:'Subtotal',promo:'Promo',
+ E:{x:'The invoice expired. Nothing was charged.',d:'The payment did not go through.',c:'Prices changed, check the total.',TIMEOUT:'The shop did not answer. Try again.',RATE_LIMITED:'Too fast. Try again in a moment.',NOT_ALLOWED:'Open the chat with the bot to order.'}},
+W=window.TelegramWidget||{},A=document.getElementById('a'),$=s=>A.querySelector(s),S='<svg class="st"><use href="#s"/></svg>',
+P=s=>{try{return JSON.parse(s)}catch(e){}},can=!!W.viewer&&!W.isPreview&&!W.isForward,
+save=()=>{try{localStorage.setItem('c',JSON.stringify(L))}catch(e){}},
+hap=k=>{try{k?W.HapticFeedback.notificationOccurred(k):W.HapticFeedback.selectionChanged()}catch(e){}},
+sum=()=>D.i.reduce((s,x,i)=>s+x.p*L.q[i],0),cut=()=>L.a&&D.c?Math.round(sum()*D.c.k/100):0,
+// The total counts to its new value; plain text, so every app draws it (clipped digit wheels don't).
+od=(el,n)=>{const f=V==null?n:V,t0=Date.now();V=n;(function s(){const k=Math.min(1,(Date.now()-t0)/450);el.textContent=Math.round(f+(n-f)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(s)})()};
+let D,L,V,busy=0,err='',mode;
+// The bot's state wins outside the cart; inside it the device keeps the quantities until Pay.
+function take(s){
+ const d=P(s);if(!d||!d.i||W.isForward)return;const was=D&&D.s;D=d;
+ if(!L||L.o!=d.o||d.s=='w'||d.s=='p')L={o:d.o,q:d.i.map(x=>x.q),a:d.c?d.c.a:0};
+ err=d.s=='f'?C.E[d.e]||C.E.d:'';save();draw();
+ if(d.s=='p'&&was&&was!='p')hap('success')
+}
+function draw(){
+ if(!D){A.innerHTML='<div class="h">'+C.title+'</div><div class="d">'+C.none+'</div>';return}
+ const m=D.s=='p'?'p':D.s=='w'?'w':'c',lock=m!='c'||!can,t=sum()-cut();
+ if(m!=mode){mode=m;
+  A.innerHTML=(m=='p'?'<div class="P"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#2fa866"/><path d="M20 33l8 8 16-17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+C.paid+'<span class="d">#'+D.o+'</span></div>':'<div class="h"><span class="g">'+C.title+'</span><span class="d">#'+D.o+'</span></div>')+
+  D.i.map((x,i)=>'<div class="r'+(lock&&!L.q[i]?' z':'')+'" style="--h:'+(i*137+255)%360+'"><div class="th">'+x.e+'</div><div class="g"><div class="n">'+x.n+'</div><div class="d">'+x.p+C.each+'</div></div>'+
+   (lock?'<b></b>':'<div class="sp"><button>−</button><b></b><button>+</button></div>')+'</div>').join('')+
+  (D.c&&(!lock||L.a)?'<button class="cp"><i>'+D.c.n+'</i><span class="g d">−'+D.c.k+'%</span><u></u></button>':'')+
+  '<div class="bx"><div class="l"><span>'+C.sub+'</span><span id="sb"></span></div><div class="l"><span>'+C.promo+'</span><span id="pr"></span></div>'+
+  '<div class="l T">'+C.total+'<span>'+S+'<span id="t"></span></span></div>'+
+  (m=='p'?'</div><div class="m"><button id="cy">'+C.copy+'</button></div>':'<button class="b"></button></div><div class="m"></div>');
+  // Steppers and the coupon stay on the device; only Pay asks the bot.
+  A.querySelectorAll('.sp button').forEach((b,k)=>b.onclick=()=>{const i=k>>1,q=L.q[i]+(k%2||-1);if(busy||q<0||q>9)return;
+   L.q[i]=q;err='';save();hap();draw();const th=A.querySelectorAll('.th')[i];th.className='th p'+q%2});
+  const cp=$('.cp'),b=$('.b'),cy=$('#cy');
+  if(cp)cp.onclick=()=>{if(mode=='c'&&can&&!busy){L.a^=1;save();hap();draw()}};
+  if(b)b.onclick=()=>mode=='c'&&can&&sum()-cut()&&ask('p'+L.q.join('')+'c'+L.a);
+  if(cy)cy.onclick=()=>W.copyText(D.id)
+ }
+ A.querySelectorAll('.r b').forEach((b,i)=>b.textContent=(lock?'× ':'')+L.q[i]);
+ const cp=$('.cp');if(cp){cp.className='cp'+(L.a?' on':'');cp.lastChild.textContent=L.a?'✓':C.apply}
+ $('#sb').textContent=sum();$('#pr').textContent=cut()?'−'+cut():'—';$('#pr').className=cut()?'ok':'';
+ od($('#t'),m=='c'?t:D.t);
+ const b=$('.b'),msg=$('.m');
+ if(b){
+  b.className='b'+(m=='w'||busy?' w':!t||!can?' off':'');
+  b.innerHTML=m=='w'?C.wait:busy?C.busy:!can?C.view:!t?C.empty:(err?C.again:C.pay)+' · '+S+t;
+  msg.className='m d'+(err?' er':'');
+  msg.innerHTML=m=='w'?C.sent+'<button>'+C.change+'</button>':err;
+  if(m=='w')msg.lastChild.onclick=()=>ask('x')
+ }
+ W.ready&&W.ready()
+}
+// Called inside a tap: request() works only there.
+function ask(data){
+ if(busy||!W.request)return;busy=1;err='';draw();
+ W.request(data).then(a=>{busy=0;const r=P(a.result)||{};if(r.i)take(a.result);else{err=C.E[r.e]||C.E.d;hap('error');draw()}},
+  e=>{busy=0;err=C.E[e.code]||C.E.d;hap('error');draw()})
+}
+try{L=P(localStorage.getItem('c'))}catch(e){}
+take(W.chatData);if(!D)draw();
+W.onEvent&&W.onEvent('chatDataChanged',()=>take(W.chatData));
+</script>

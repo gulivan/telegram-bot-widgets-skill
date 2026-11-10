@@ -26,4 +26,6 @@ for (const [name, size, max] of rows) {
   ok &&= fits;
   console.log(`${fits ? "ok  " : "OVER"} ${name}: ${size} / ${max} bytes`);
 }
+// Node's zlib packs a little worse than the server's; near the limit, the server's count may still fit.
+if (packed > 3996) console.log("near the limit: confirm with python3 -c 'import sys,zlib; print(len(zlib.compress(sys.stdin.buffer.read(), 9)))' < " + file);
 process.exit(ok ? 0 : 1);
