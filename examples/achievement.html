@@ -1,0 +1,114 @@
+<!-- Achievement: a medal that unlocks live, then claim and share. State and requests: see logic.mjs. -->
+<style>
+body{margin:0;padding:0 0 max(10px,env(safe-area-inset-bottom));font-family:system-ui,sans-serif}
+button{border:0;font:inherit;color:inherit;background:none;padding:0}
+svg{display:block}
+.s{--m:85%;--k:hsl(var(--h),60%,11%);position:relative;height:268px;overflow:hidden;text-align:center;color:#fff;background:var(--k)}
+.lk{--m:7%;--k:hsl(var(--h),8%,15%)}
+.s>*{position:absolute}
+.ry,.rg,.bd,.pg,.cf,.sk{left:50%;top:108px}
+.ry{width:560px;height:560px;margin:-280px;border-radius:50%;background:repeating-conic-gradient(hsla(var(--h),var(--m),72%,.22) 0 8deg,transparent 0 22.5deg);animation:sp 60s linear infinite}
+.vg{top:0;right:0;bottom:0;left:0;background:radial-gradient(circle at 50% 108px,hsla(var(--h),var(--m),55%,.55),transparent 130px),radial-gradient(circle at 50% 108px,transparent 70px,var(--k) 240px)}
+@keyframes sp{to{transform:rotate(1turn)}}
+.rg{width:120px;height:120px;margin:-60px;border-radius:50%;border:0 solid hsla(var(--h),90%,82%,.8);box-sizing:border-box}
+.go .rg{animation:rg .9s .2s cubic-bezier(.2,.7,.3,1)}
+@keyframes rg{from{transform:scale(.4);border-width:8px}to{transform:scale(2.2);border-color:transparent}}
+.cf i{position:absolute;width:7px;height:11px;margin:-5px -3px;border-radius:2px;transform:scale(0)}
+.go .cf i{animation:cf 1.7s .25s cubic-bezier(.1,.6,.4,1)}
+@keyframes cf{0%{transform:none}65%{transform:translate(var(--x),var(--y)) rotate(var(--r))}to{transform:translate(var(--x),calc(var(--y) + 22px)) rotate(var(--r)) scale(0)}}
+.bd{width:132px;height:132px;margin:-66px}
+.go .bd{animation:in .7s cubic-bezier(.2,1.5,.4,1)}
+@keyframes in{from{transform:scale(0) rotate(-40deg)}}
+.ro{width:132px;height:132px;fill:hsl(var(--h),var(--m),42%);stroke:hsl(var(--h),var(--m),42%);stroke-width:7;stroke-linejoin:round;animation:sp 40s linear infinite}
+.fc{position:absolute;top:12px;right:12px;bottom:12px;left:12px;border-radius:50%;overflow:hidden;background:conic-gradient(from 200deg,hsl(var(--h),var(--m),90%),hsl(var(--h),var(--m),56%),hsl(var(--h),var(--m),28%),hsl(var(--h),var(--m),68%),hsl(var(--h),var(--m),93%),hsl(var(--h),var(--m),48%),hsl(var(--h),var(--m),90%));box-shadow:0 6px 0 -2px hsla(var(--h),var(--m),12%,.5)}
+.fc:before{content:"";position:absolute;top:8px;right:8px;bottom:8px;left:8px;border-radius:50%;background:radial-gradient(circle at 35% 28%,hsl(var(--h),var(--m),84%),hsl(var(--h),var(--m),50%) 75%);box-shadow:0 0 0 2px hsla(var(--h),var(--m),25%,.45)}
+.fc svg{position:absolute;top:27px;left:27px;width:54px;height:54px;fill:hsl(var(--h),var(--m),27%)}
+.fc use+use{fill:hsl(var(--h),var(--m),93%)}
+.fc i{position:absolute;top:0;bottom:0;left:-60%;width:36%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:sh 4s 1s infinite}
+@keyframes sh{0%,70%{transform:none}to{transform:translateX(480%)}}
+.sk{width:18px;height:18px;margin:-9px;fill:hsl(var(--h),90%,88%);transform:scale(0);animation:tw 2.8s infinite}
+@keyframes tw{50%{transform:scale(1) rotate(45deg)}}
+.lk .fc i,.lk .ry,.lk .sk,.pg{display:none}
+.pg{width:156px;height:156px;margin:-78px;fill:none;stroke-width:5;stroke-linecap:round;transform:rotate(-90deg)}
+.lk .pg{display:block}
+.pg circle{stroke:rgba(255,255,255,.14)}
+.pg circle+circle{stroke:hsl(var(--h),85%,65%);stroke-dasharray:452;transition:stroke-dashoffset .8s}
+.lb,.tt,.ds{left:0;right:0}
+.lb{top:14px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:hsl(var(--h),var(--m),80%)}
+.tt{top:188px;font:800 23px/1.2 ui-rounded,system-ui}
+.ds{top:220px;padding:0 16px;font-size:13px;white-space:pre-line;color:rgba(255,255,255,.75)}
+.go .tt,.go .ds{animation:in2 .5s .45s backwards cubic-bezier(.2,1.4,.4,1)}
+@keyframes in2{from{transform:scale(0)}}
+.nx{display:flex;align-items:center;gap:10px;margin:12px 12px 0}
+.mn{width:38px;height:38px;border-radius:50%;background:var(--tg-theme-secondary-bg-color);fill:hsl(var(--h),70%,55%)}
+.mn svg{margin:9px;width:20px;height:20px}
+.g{flex:1}
+.d{color:var(--tg-theme-hint-color);font-size:.87em}
+.br{height:8px;margin-top:6px;border-radius:4px;overflow:hidden;background:var(--tg-theme-secondary-bg-color)}
+.br i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,hsl(var(--h),80%,52%),hsl(calc(var(--h) + 40),85%,60%));transform-origin:0}
+.br .a{animation:gr 1s .5s backwards cubic-bezier(.2,.8,.2,1)}
+@keyframes gr{from{transform:scaleX(0)}}
+.bt{display:flex;gap:8px;margin:12px 12px 0}
+.b{flex:1;height:46px;border-radius:14px;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color);font-weight:600}
+.b.q{flex:0 0 84px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
+.b.off{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color)}
+.m{min-height:1.3em;margin-top:6px;text-align:center;color:var(--tg-theme-destructive-text-color);font-size:.87em}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<svg width="0" height="0" style="position:absolute"><symbol id="e0" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.1-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></symbol>
+<symbol id="e1" viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-2 1-4 2-5 0 2 1 3 2 3 1-3 0-6 2-10z"/></symbol>
+<symbol id="e2" viewBox="0 0 24 24"><path d="M14 3a9 9 0 1 0 7 13A8 8 0 0 1 14 3z"/></symbol>
+<symbol id="e3" viewBox="0 0 24 24"><path d="M13 2L5 14h5l-1 8 8-12h-5z"/></symbol>
+<symbol id="e9" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></symbol></svg>
+<div class="s" id="s"></div><div id="lo"></div>
+<script>
+const C={won:'Achievement unlocked',soon:'Almost there',next:'Next: ',claim:'Claim +',xp:' XP',got:'Claimed ✓',share:'Share',step:'Check in today',busy:'…',view:'Open the bot to continue',
+ E:{TIMEOUT:'No answer. Try again.',RATE_LIMITED:'Too fast. Try again in a moment.',d:'Something went wrong. Try again.'}},
+W=window.TelegramWidget||{},$=i=>document.getElementById(i),S=$('s'),P=s=>{try{return JSON.parse(s)}catch(e){}},
+can=!!W.viewer&&!W.isPreview&&!W.isForward,
+hap=k=>{try{W.HapticFeedback.notificationOccurred(k)}catch(e){}},
+mem=v=>{try{return v?localStorage.setItem('s',v):localStorage.getItem('s')}catch(e){}},
+// Two balanced lines, so a long line never leaves one word alone.
+bal=t=>{const i=t.lastIndexOf(' ',t.length/2+4);return t.length<30||i<0?t:t.slice(0,i)+'\n'+t.slice(i+1)};
+let D,busy='',err='',was,go='',grow;
+// The stage, rebuilt to replay the unlock: new nodes always run their animations.
+function stage(){
+ let i=0,a,s='<i class="ry"></i><i class="vg"></i><i class="rg"></i><button class="bd" id="bd"><svg class="ro" viewBox="-66 -66 132 132"><polygon points="';
+ for(;i<16;i++){a=i*Math.PI/8;s+=(i%2?54:61)*Math.cos(a)+','+(i%2?54:61)*Math.sin(a)+' '}
+ s+='"/></svg><span class="fc"><svg viewBox="0 0 24 24"><use id="u1" y="1"/><use id="u2"/></svg><i></i></span></button><div class="cf">';
+ for(i=0;i<18;i++){a=i*2.4;s+='<i style="background:hsl('+i*47%360+',90%,62%);--x:'+(Math.cos(a)*(80+i*37%60)|0)+'px;--y:'+(Math.sin(a)*(30+i*53%26)-10|0)+'px;--r:'+(i*97%720-360)+'deg"></i>'}
+ s+='</div>'+[[-74,-38,0],[70,-50,1],[62,46,2]].map(([x,y,d])=>'<svg class="sk" style="translate:'+x+'px '+y+'px;animation-delay:'+d+'s"><use href="#e9"/></svg>').join('')+
+  '<svg class="pg" viewBox="-78 -78 156 156"><circle r="72"/><circle id="pg" r="72"/></svg><div class="lb" id="lb"></div><div class="tt" id="tt"></div><div class="ds" id="ds"></div>';
+ S.innerHTML=s;grow=1;
+ $('bd').onclick=()=>D&&D.u&&boom()
+}
+function boom(){go=' go';stage();draw();hap('success')}
+function take(s){
+ const d=P(s);if(!d||!d.n)return;D=d;
+ if(d.u&&(was===0||!mem())){mem(1);boom()}else draw();
+ was=d.u?1:0
+}
+function draw(){
+ const d=D||{},x=d.nx,b=(c,id,t)=>'<button class="b'+c+'" id="'+id+'">'+t+'</button>';
+ S.className='s'+(d.u?'':' lk')+go;S.style.setProperty('--h',d.h??262);
+ for(const u of'12')$('u'+u).setAttribute('href','#e'+(d.g|0));
+ $('lb').textContent=D?d.u?C.won:C.soon:'';$('tt').textContent=d.n||'—';$('ds').textContent=bal(d.d||'');
+ $('pg').style.strokeDashoffset=452*(1-(d.v/d.m||0));
+ $('lo').innerHTML=!D?'':(d.u?(x?'<div class="nx" style="--h:'+x.h+'"><div class="mn"><svg><use href="#e'+x.g+'"/></svg></div><div class="g">'+C.next+'<b>'+x.n+'</b><div class="br"><i'+(grow?' class="a"':'')+' style="transform:scaleX('+x.v/x.m+')"></i></div></div><span class="d">'+x.v+' / '+x.m+'</span></div>':'')+
+  '<div class="bt">'+(can?b(d.c||busy?' off':'','c',busy?C.busy:d.c?C.got:C.claim+d.x+C.xp):'')+(d.k?b(' q','k',C.share):'')+'</div>'
+  :'<div class="nx"><div class="g"><b>'+d.v+' / '+d.m+'</b> <span class="d">'+d.r+'</span></div></div><div class="bt">'+b(can&&!busy?'':' off','p',busy?C.busy:can?C.step:C.view)+'</div>')+
+  '<div class="m">'+err+'</div>';
+ grow=0;
+ const on=(id,f)=>$(id)&&($(id).onclick=f);
+ on('c',()=>d.c||ask('c'));on('p',()=>can&&ask('+'+d.v));
+ on('k',()=>{try{W.openTelegramLink(d.k)}catch(e){W.copyText(d.k)}});
+ W.ready&&W.ready()
+}
+// Called inside a tap: request() works only there.
+function ask(data){
+ if(busy||!W.request)return;busy=data;err='';draw();
+ W.request(data).then(a=>{busy='';P(a.result)?.n?take(a.result):(err=C.E.d,draw())},e=>{busy='';err=C.E[e.code]||C.E.d;hap('error');draw()})
+}
+stage();take(W.chatData);if(!D)draw();
+W.onEvent&&W.onEvent('chatDataChanged',()=>take(W.chatData));
+</script>

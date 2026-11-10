@@ -1,6 +1,6 @@
 ---
 name: telegram-bot-widgets
-description: Build, send and answer Telegram bot HTML widgets (Bot API 10.4, sendWidget, widget_query, answerWidgetQuery, editMessageWidgetData, TelegramWidget JS). Use when a bot should show an interactive block inside a message (quiz, poll, chart, progress card, game, ticker, promo code), when handling widget_query / shared_widget_query updates, when a widget fails to send (INPUT_MEDIA_WIDGET_TOO_LARGE, HTML_INVALID), or when a widget misbehaves (requests rejected with NOT_ALLOWED/BUSY/TIMEOUT, nothing drawn, blank in dark mode, users can't screenshot).
+description: Build, send and answer Telegram bot HTML widgets (Bot API 10.4, sendWidget, widget_query, answerWidgetQuery, editMessageWidgetData, TelegramWidget JS). Use when a bot should show an interactive block inside a message (quiz, poll, chart, progress card, game, ticker, promo code, weather card, checkout with Telegram Stars, achievement badge), when handling widget_query / shared_widget_query updates, when a widget fails to send (INPUT_MEDIA_WIDGET_TOO_LARGE, HTML_INVALID), or when a widget misbehaves (requests rejected with NOT_ALLOWED/BUSY/TIMEOUT, nothing drawn, blank in dark mode, users can't screenshot).
 ---
 
 # Telegram bot widgets
@@ -28,14 +28,19 @@ https://core.telegram.org/bots/widgets and https://core.telegram.org/bots/api#se
      Use it for a ticker or a poll.
    - **Requests** (`allow_queries`) only if the widget must talk back (answers, votes, refresh).
 2. **Write the HTML.** Use [references/widget-runtime.md](references/widget-runtime.md) and
-   [references/design.md](references/design.md); start from [examples/quiz.html](examples/quiz.html).
+   [references/design.md](references/design.md); start from [examples/quiz.html](examples/quiz.html),
+   or from the closest of [weather](examples/weather.html) (shared state, no requests),
+   [checkout](examples/checkout.html) (requests and a Stars invoice),
+   [achievement](examples/achievement.html) (a live state change with an animation).
+   [references/patterns.md](references/patterns.md) has what carries over.
    - Draw the first state synchronously from `TelegramWidget.chatData`.
    - Use theme variables, never hard-coded colors, and no network.
 3. **Check the size:** `node examples/check-size.mjs widget.html`.
    - The limits are ≤32768 bytes of HTML and ≤4096 bytes after zlib level 9, the server's count.
    - `chat_data`/`public_data` are ≤1024 **bytes** each (512 Cyrillic letters fill it).
 4. **Preview locally:** `node examples/preview.mjs widget.html '<chat_data json>'` writes an HTML page
-   with light and dark bubbles at phone widths and a stand-in `TelegramWidget`.
+   with light and dark bubbles at phone widths and a stand-in `TelegramWidget`. It allows one
+   request per tap, as the app does, and counts nodes, CSS rules and heavy elements per bubble.
 5. **Send** with `sendWidget` (see [references/bot-api.md](references/bot-api.md)). On a 400,
    fall back to the same text as a normal message, so nobody misses it.
 6. **Handle requests** if `allow_queries`:
@@ -75,7 +80,12 @@ https://core.telegram.org/bots/widgets and https://core.telegram.org/bots/api#se
 - [references/widget-runtime.md](references/widget-runtime.md): the `TelegramWidget` object, events, CSS variables, sandbox limits.
 - [references/design.md](references/design.md): native look, sizes, the time in the corner, gestures, accessibility.
 - [references/production-notes.md](references/production-notes.md): lessons from shipping widgets to real users (reliable answers, fallbacks, A/B, packaging).
+- [references/patterns.md](references/patterns.md): patterns from the examples: motion without heavy elements, one door for state, safe retries, a shared widget, paying with Stars, size tricks.
 - [examples/quiz.html](examples/quiz.html): a three-question quiz that records answers through the bot and survives retries.
-- [examples/bot.mjs](examples/bot.mjs): a dependency-free Node bot that sends the quiz and answers its taps.
+- [examples/weather.html](examples/weather.html): a shared widget, a living sky whose horizon is the next six hours; one edit moves every message.
+- [examples/checkout.html](examples/checkout.html): a cart edited on the device and paid with a Telegram Stars invoice.
+- [examples/achievement.html](examples/achievement.html): a medal that unlocks live when the bot edits the state, with claim and share.
+- [examples/logic.mjs](examples/logic.mjs): what the bot does with each request, as pure functions, plus sample states.
+- [examples/bot.mjs](examples/bot.mjs): a dependency-free Node bot for all four examples, Stars payments (refunded) included.
 - [examples/check-size.mjs](examples/check-size.mjs): checks HTML and state against Telegram's limits.
-- [examples/preview.mjs](examples/preview.mjs): a local preview page with a stand-in `TelegramWidget`.
+- [examples/preview.mjs](examples/preview.mjs): a local preview page with a stand-in `TelegramWidget` that answers like the bot, state buttons and a caps meter.
